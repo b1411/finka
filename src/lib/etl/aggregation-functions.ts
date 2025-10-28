@@ -5,6 +5,7 @@ import {
   FOTConsolidated,
   ConsolidationRule 
 } from '@/types/consolidated-entities';
+import { FundingSourceCode } from '@/types/finka-core';
 
 /**
  * ETL функции для агрегации данных из STG слоя в основные таблицы
@@ -70,7 +71,7 @@ export async function aggregateRevenuesToBDR(
       user_id: accrual.user_id,
       status: 'approved',
       revenue_type: getRevenueType(accrual.funding_source),
-      funding_source: accrual.funding_source,
+      funding_source: accrual.funding_source as FundingSourceCode,
       article_code: accrual.article_code,
       planned_amount: accrual.accrual_amount,
       actual_amount: accrual.accrual_amount,
@@ -111,7 +112,7 @@ export async function aggregateCashFlowToDDS(
       user_id: payment.user_id,
       status: 'approved',
       flow_type: 'inflow', // Все поступления - приток
-      funding_source: payment.funding_source,
+      funding_source: payment.funding_source as FundingSourceCode,
       article_code: payment.article_code,
       transaction_date: payment.payment_date,
       document_date: payment.doc_date,
@@ -212,7 +213,7 @@ export async function consolidateDataToFOT(
 
 // ================== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==================
 
-function getRevenueType(fundingSource: string): string {
+function getRevenueType(fundingSource: string): 'tuition' | 'budget' | 'grants' | 'other' {
   switch (fundingSource) {
     case 'PU': return 'tuition';
     case 'RB': return 'budget';
